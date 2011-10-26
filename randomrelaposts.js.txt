@@ -1,0 +1,102 @@
+﻿var relatitles = new Array();
+var relaurls = new Array();
+var relasummary = new Array();
+var relaimage = new Array();
+var relatitlesnumber = 0;
+var relamaxdisplay = 4;
+function readpostlabels(json) {
+for (var i = 0; i < json.feed.entry.length; i++) {
+      var entry = json.feed.entry[i];
+      relatitles[relatitlesnumber] = entry.title.$t;
+      postcontent = "";
+      if ("content" in entry) {
+        postcontent = entry.content.$t;
+      } else if ("summary" in entry) {
+        postcontent = entry.summary.$t;
+      }
+      relasummary[relatitlesnumber] = eliminattags(postcontent,75);
+      if ("media$thumbnail" in entry) {
+        postimg = entry.media$thumbnail.url;
+      } else {
+        var cat = entry.category[0].term;
+        postimg = "http://3.bp.blogspot.com/_hljKDuw-cxQ/SsmfbhHhGrI/AAAAAAAAOU0/vCmT5Y4wzEo/s00/vagaPlantilla_resumenpostsnoimage.gif";
+        if(cat=="Blogger"){postimg = "http://1.bp.blogspot.com/_hljKDuw-cxQ/TP7_PPp5WtI/AAAAAAAARSM/WLGHzKEoMTo/s00/rels_blogger.jpg"}
+        if(cat=="CSS"){postimg = "http://4.bp.blogspot.com/_hljKDuw-cxQ/TP8A7OuHC8I/AAAAAAAARSU/lB88vqmLsGs/s00/rels_css.jpg"}
+        if(cat=="Facebook"){postimg = "http://4.bp.blogspot.com/_hljKDuw-cxQ/TQBM6PRgqAI/AAAAAAAARSg/riZXsPNTncM/s00/rels_facebook.jpg"}
+        if(cat=="HTML"){postimg = "http://4.bp.blogspot.com/_hljKDuw-cxQ/TQBKrvnVpHI/AAAAAAAARSY/ykioGlqkHb0/s00/rels_html.jpg"}
+        if(cat=="JavaScript"){postimg = "http://3.bp.blogspot.com/_hljKDuw-cxQ/TQBKsB8M95I/AAAAAAAARSc/E4BH7kpYvU0/s00/rels_javascript.jpg"}
+        if(cat=="JQuery"){postimg = "http://4.bp.blogspot.com/_hljKDuw-cxQ/TP78zfaOmUI/AAAAAAAARSI/hbG82lpDCRk/s00/rels_jquery.jpg"}
+        if(cat=="Twitter"){postimg = "http://3.bp.blogspot.com/_hljKDuw-cxQ/TP8A62ApydI/AAAAAAAARSQ/XqKmkMB31QE/s00/rels_twitter.jpg"}
+      }
+      relaimage[relatitlesnumber] = postimg;
+      for (var k = 0; k < entry.link.length; k++) {
+         if (entry.link[k].rel == 'alternate') {
+            relaurls[relatitlesnumber] = entry.link[k].href;
+            break;
+         }
+      }
+      relatitlesnumber++;
+   }
+}
+function displayrelatedposts() {
+   var tmp = new Array(0);
+   var tmp2 = new Array(0);
+   var tmp3 = new Array(0);
+   var tmp4 = new Array(0);
+   for(var i = 0; i < relaurls.length; i++) {
+      if(!contains(tmp, relaurls[i])) {
+         tmp.length += 1; tmp[tmp.length - 1] = relaurls[i];
+         tmp2.length += 1; tmp2[tmp2.length - 1] = relatitles[i];
+         tmp3.length += 1; tmp3[tmp3.length - 1] = relasummary[i];
+         tmp4.length += 1; tmp4[tmp4.length - 1] = relaimage[i];
+      }
+   }
+   relatitles = tmp2; relaurls = tmp; relasummary = tmp3; relaimage = tmp4;
+  for(var i = 0; i < relatitles.length; i++){
+    var indice = Math.floor((relatitles.length - 1) * Math.random());
+    var tempTitle = relatitles[i]; var tempUrls = relaurls[i];
+    var tempSummary = relasummary[i]; var tempImage = relaimage[i];
+    relatitles[i] = relatitles[indice]; relaurls[i] = relaurls[indice];
+    relasummary[i] = relasummary[indice]; relaimage[i] = relaimage[indice];
+    relatitles[indice] = tempTitle; relaurls[indice] = tempUrls;
+    relasummary[indice] = tempSummary; relaimage[indice] = tempImage;
+  }
+   var minPosts = 0;
+   var r = Math.floor((relatitles.length - 1) * Math.random());
+   var i = 0;
+   var output;
+   var dirURL = document.URL;
+   while (i < relatitles.length && i < relamaxdisplay) {
+      if (relaurls[r] != dirURL) {
+         output = "<div class='relaposts'>";
+         output += "<a href='" + relaurls[r] + "' rel='nofollow'  target='_blank' title='" + relatitles[r] + "'><img src='" + relaimage[r] + "' /></a>";
+         output += "<h6><a href='" + relaurls[r] + "' target='_blank'>" + relatitles[r] + "</a></h6>";
+         output += "<p>" + relasummary[r] + " ... </p>";
+         output += "</div>";
+         document.write(output); 
+      }
+      if (r < relatitles.length - 1) {
+         r++;
+      } else {
+         r = 0;
+      }
+      i++;
+      minPosts++;
+      if (minPosts == relamaxdisplay) { break; }
+   }
+}
+function eliminattags(cual,longitud){
+  var summary = cual.split("<");
+  for(var i=0;i<summary.length;i++){
+    if(summary[i].indexOf(">")!=-1){
+      summary[i] = summary[i].substring(summary[i].indexOf(">")+1,summary[i].length);
+    }
+  }
+  summary = summary.join("");
+  summary = summary.substring(0,longitud-1);
+  return summary;
+} 
+function contains(a, e) {
+  for(var j = 0; j < a.length; j++) if (a[j]==e) return true;
+  return false;
+}
